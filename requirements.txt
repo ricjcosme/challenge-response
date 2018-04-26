@@ -1,0 +1,13 @@
+base58==1.0.0
+bottle==0.12.13
+canister==1.5.1
+certifi==2018.4.16
+chardet==3.0.4
+decorator==4.3.0
+ed25519==1.4
+idna==2.6
+ply==3.11
+PyJWT==1.6.1
+requests==2.18.4
+six==1.11.0
+urllib3==1.22
