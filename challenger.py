@@ -48,7 +48,7 @@ class MyHttpHandler(BaseHTTPRequestHandler):
         try:
             content_len = int(self.headers.get('content-length', 0))
             post_body = self.rfile.read(content_len)
-            verify(challenge, b"wfgweoriufhoewriughowreiughwoeriughweroiug", pubkey)
+            verify(challenge, post_body, pubkey)
             # Send the html message
             self.wfile.write(b"Valid sig")
             sys.exit("Challengee's DID %s is legit!!" % challengee_did)
