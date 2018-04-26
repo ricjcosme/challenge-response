@@ -12,6 +12,7 @@ import re
 import time
 from multiprocessing import Pool
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import parse_qs
 
 if len(sys.argv[1:]) < 1:
     sys.exit("Need challengee's DID")
@@ -40,11 +41,15 @@ class MyHttpHandler(BaseHTTPRequestHandler):
 
     challenge = ""
     pubkey = ""
+    callback_id = ""
 
     def do_POST(self):
         self.send_response(200)
         self.send_header('Content-type', 'application/json')
         self.end_headers()
+        if callback_id != self.path.split("?")[1]:
+            self.wfile.write(b"Unknown callback handle")
+            sys.exit("Unknown callback handle")
         try:
             content_len = int(self.headers.get('content-length', 0))
             post_body = self.rfile.read(content_len)
@@ -55,6 +60,7 @@ class MyHttpHandler(BaseHTTPRequestHandler):
         except Exception:
             self.wfile.write(b"Invalid sig")
             sys.exit("Challengee's DID %s is NOT legit!!" % challengee_did)
+        return
 
     def log_message(self, format, *args):
         return
@@ -87,7 +93,9 @@ try:
     pubKey_identifier = [x for x in json_did_doc["authentication"]][0]["publicKey"]
     pubkey = [x for x in json_did_doc["publicKey"] if x["id"] == pubKey_identifier][0]["publicKeyBase58"]
     print("Challengee's PublicKey: %s" % pubkey)
-    challenge_data = {"payload": challenge, "callback": "http://127.0.0.1:8782/callback"}
+    # generate callback handle id
+    callback_id = id_generator()
+    challenge_data = {"payload": challenge, "callback": "http://127.0.0.1:8782/callback?" + callback_id}
 
     s = requests.session()
     challengee_addr = endpoint + "/.identity/challenge"
@@ -96,6 +104,7 @@ try:
     pool = Pool(processes=2)
     MyHttpHandler.pubkey = pubkey
     MyHttpHandler.challenge = challenge
+    MyHttpHandler.callback_id = callback_id
     server = HTTPServer(('', 8782), MyHttpHandler)
 
     # start local async callback to receive challengee's response
