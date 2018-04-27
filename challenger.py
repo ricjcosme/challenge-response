@@ -20,6 +20,7 @@ challengee_did = str(sys.argv[1:][0])
 
 # universal resolver is converting array to objects when only one item is found
 # using dominode's resolver to standards enforce standards definition
+# https://github.com/decentralized-identity/universal-resolver/issues/14
 pattern = re.compile("^did:dom:[a-km-zA-HJ-NP-Z1-9]{30,30}$")
 if not pattern.match(challengee_did):
     sys.exit("Invalid DID provided")
