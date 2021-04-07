@@ -1,5 +1,5 @@
 base58==1.0.0
-bottle==0.12.13
+bottle==0.12.19
 canister==1.5.1
 certifi==2018.4.16
 chardet==3.0.4
